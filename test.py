@@ -1,3 +1,10 @@
+# ikomaさん（https://zenn.dev/ikoma_3）
+# 元ソースのURL：https://gist.github.com/ikoma3/393308b2283691f32a84a3dae4a08c8b
+# 解説URL：https://zenn.dev/ikoma_3/articles/5c04ab03935f71
+#
+# 上記のソースに-ぐ-（https://qiita.com/g1ac3）が少し手を加えたソースコードです
+# 記事URL：
+#
 # 想定フォルダ構成
 # <このフォルダ>
 #   ├── test.py                     # このファイル
@@ -6,7 +13,7 @@
 #          ├── in/                  # テスト入力
 #          ├── out/                 # テスト出力
 #          ├── vis.exe              # ローカルテスタ実行ファイル ※windows用のコンパイル済みバイナリの場合
-#          └── target/release/vis   # ローカルテスタ実行ファイル 
+#          └── target/release/vis   # ローカルテスタ実行ファイル
 
 ###### テスト実行設定
 
@@ -14,38 +21,28 @@
 #  例
 #   C++の場合 ：a.exe
 #   Rustの場合：<Rustプロジェクトフォルダ>/target/release/***.exe
-PROGRAM_CMD = "python sample.py"
+PROGRAM_CMD = "./a.out"
 
 # テスト対象seed番号
 START_SEED=0
 SIZE=100
 STEP=1
 
-
 # 最大並列処理数
 MAX_WORKERS = 16
-
 
 # スコア表示文字列 # ローカルテスタ（ビジュアライザ）が出力する形式に合わせて変更する
 TESTER_OUTPUT_SCORE_TXT = "Score ="
 
-
 # ローカルテスタ テストコマンド (例：AHC027)
 TESTER_DIR = "tools" # Windows用のコンパイル済みバイナリの場合は "tools_x86_64-pc-windows-gnu"
-TESTER_CMD = r"target\release\vis.exe" # cargo runより直接呼んだ方が速い ※cargo build --release --bin vis で事前にビルド必要
-# TESTER_CMD = r"vis.exe"
-# TESTER_CMD = "cargo run --release --bin vis"
+# TESTER_CMD = r"target\release\vis.exe" # cargo runより直接呼んだ方が速い ※cargo build --release --bin vis で事前にビルド必要
 
 # 入出力テストファイルフォルダ
 TEST_IN_DIR = "in"
 TEST_OUT_DIR = "out"
 
-
 ###### テスト実行設定 ここまで
-
-
-
-
 
 import os,subprocess,time
 from concurrent import futures
@@ -53,6 +50,9 @@ from math import log10
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 TEST_IDS = list(range(START_SEED,START_SEED+SIZE*STEP,STEP)) # テスト対象seed番号リスト生成
+
+TESTER_CMD = os.path.join(script_dir, TESTER_DIR, r"target/release/vis") #絶対パスでビジュアライザを実行するコマンド
+BUILD_CMD = "cargo build --release --bin vis --manifest-path " + os.path.join(script_dir, TESTER_DIR, "Cargo.toml") #ビジュアライザのビルド用コマンド
 
 class TaskInfo:
     def __init__(self, score:int, time:float, seed:int=0):
@@ -92,13 +92,14 @@ class Task:
         return ret
 
 def task(seed:int, in_path:str, out_path:str) -> TaskInfo:
-    if not os.path.exists(os.path.dirname(out_path)):os.makedirs(os.path.dirname(out_path))
+    if not os.path.exists(os.path.dirname(out_path)):os.makedirs(os.path.dirname(out_path), exist_ok=True)
     ret = Task.execute(input_file=in_path, output_file=out_path, seed=seed)
     return ret
 
 
 if __name__ == '__main__':
     executor = futures.ThreadPoolExecutor(max_workers=MAX_WORKERS)
+    subprocess.run(BUILD_CMD, shell=True) #まずはビジュアライザをビルドする
 
     t_test_start = time.perf_counter()
     tasks = []
