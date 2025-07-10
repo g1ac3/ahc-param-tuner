@@ -44,7 +44,7 @@ TEST_OUT_DIR = "out"
 
 ###### テスト実行設定 ここまで
 
-import os,subprocess,time
+import os,subprocess,time,sys
 from concurrent import futures
 from math import log10
 
@@ -65,6 +65,8 @@ class Task:
     def execute(cls, input_file:str="", output_file:str="", seed:int=0):
         t_start = time.perf_counter()
         cmd = f"{PROGRAM_CMD}"
+        if len(sys.argv) > 1:
+            cmd += " " + " ".join(sys.argv[1:])
         if input_file:
             cmd += f" < \"{input_file}\""
         if output_file:
