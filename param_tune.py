@@ -67,11 +67,23 @@ def objective(trial):
         raise optuna.TrialPruned()
 
 if __name__ == "__main__":
+    study_name = "ahc-param-tuner-study"
+    storage = "sqlite:///ahc-param-tuner.db"
+
+    # コマンドライン引数を確認
+    if len(sys.argv) > 1 and sys.argv[1] == "reset":
+        try:
+            optuna.delete_study(study_name=study_name, storage=storage)
+            print(f"Study '{study_name}' has been deleted.")
+        except KeyError:
+            print(f"Study '{study_name}' not found.")
+        sys.exit()
+
     # OptunaのStudyオブジェクトを作成
     # SQLiteを使って探索結果を永続化すると、中断・再開が容易になります
     study = optuna.create_study(
-        study_name="ahc-param-tuner-study",
-        storage="sqlite:///ahc-param-tuner.db",
+        study_name=study_name,
+        storage=storage,
         load_if_exists=True,
         direction="maximize"
     )
