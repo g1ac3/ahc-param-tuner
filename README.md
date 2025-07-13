@@ -16,4 +16,9 @@ AHC（AtCoder Heuristic Contest）などのヒューリスティック系コン�
 URL：（作成予定）
 ```bash
 git clone https://github.com/g1ac3/ahc-param-tuner.git
+
+python param_tune.py
+python param_tune.py reset #reset your study.
+```
+
 ~~ comming soon ~~
