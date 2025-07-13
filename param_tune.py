@@ -15,7 +15,7 @@ def objective(trial):
     # --- パラメータの探索範囲を指定してください ---
     # 例: trial.suggest_float("パラメータ名", 最小値, 最大値, log=True)
     # a.outの仕様に合わせて、パラメータ名、範囲、型（float or int）を調整してください。
-    start_temp = trial.suggest_float("start_temp", 1e3, 1e5, log=True)
+    start_temp = trial.suggest_float("start_temp", 1e2, 1e4, log=True)
     end_temp = trial.suggest_float("end_temp", 1e-1, 1e2, log=True)
     # -----------------------------------------
 
